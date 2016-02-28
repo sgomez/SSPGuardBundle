@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="ssp.guard.auth_source_factory" class="Sgomez\Bundle\SSPGuardBundle\DependencyInjection\Factory\SSPAuthSourceFactory">
+            <argument type="service" id="router"/>
+        </service>
+
+        <service id="ssp.guard.registry" class="Sgomez\Bundle\SSPGuardBundle\SimpleSAMLphp\AuthSourceRegistry">
+            <argument type="service" id="service_container"/>
+            <argument />
+        </service>
+
+    </services>
+
+</container>

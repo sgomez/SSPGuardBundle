@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="ssp.guard.twig.extension" class="Sgomez\Bundle\SSPGuardBundle\Twig\Extension\SSPGuardExtension">
+            <argument type="service" id="ssp.guard.registry"/>
+            <tag name="twig.extension"/>
+        </service>
+    </services>
+
+</container>
