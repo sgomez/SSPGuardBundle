@@ -8,9 +8,7 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Sgomez\Bundle\SSPGuardBundle\DependencyInjection;
-
 
 use Sgomez\Bundle\SSPGuardBundle\SimpleSAMLphp\SSPAuthSource;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -32,17 +30,22 @@ class SSPGuardExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
-
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
         $loader->load('twig.xml');
 
+        $configuration = $this->getConfiguration($configs, $container);
+        $config = $this->processConfiguration($configuration, $configs);
+
+        $container->setParameter('ssp_guard.installation_path', $config['installation_path']);
+        if (method_exists($container, 'resolveEnvPlaceholders')) {
+            $container->setParameter('ssp_guard.installation_path', $container->resolveEnvPlaceholders($container->getParameter('ssp_guard.installation_path'), true));
+        }
+
         // Find SimpleSAMLphp _autoload.php file
-        $autoloadPath = sprintf('%s/lib/_autoload.php', rtrim($config['installation_path'], '/'));
+        $autoloadPath = sprintf('%s/lib/_autoload.php', rtrim($container->getParameter('ssp_guard.installation_path'), '/'));
         if (false === file_exists($autoloadPath)) {
-            throw new InvalidConfigurationException('The path "simple_saml.path" doesn\'t contain a valid SimpleSAMLphp installation.');
+            throw new InvalidConfigurationException('The path "ssp_guard.installation_path" doesn\'t contain a valid SimpleSAMLphp installation: '.$autoloadPath);
         }
         $this->autoloadPath = $autoloadPath;
 
@@ -82,12 +85,12 @@ class SSPGuardExtension extends Extension
 
         $authSourceDefinition->setFactory([
             new Reference('ssp.guard.auth_source_factory'),
-            'createAuthSource'
+            'createAuthSource',
         ]);
 
         $authSourceDefinition->setArguments([
             $authSource,
-            $options
+            $options,
         ]);
 
         return $authSourceKey;
