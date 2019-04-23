@@ -1,10 +1,10 @@
 # SimpleSAMLphp Integration for Symfony: SSPGuardBundle
 
-This bundle helps you to use your [SimpleSAMLphp]() installation with Symfony. This bundle uses
-[Guard](http://symfony.com/blog/new-in-symfony-2-8-guard-authentication-component) Component to authenticate
+This bundle helps you to use your [SimpleSAMLphp](https://simplesamlphp/) installation with Symfony. This bundle uses
+[Guard](https://symfony.com/blog/new-in-symfony-2-8-guard-authentication-component) Component to authenticate
 users. 
 
-This packages is based on this two bundles:
+This package is based on these two bundles:
 
 * [KnpUOAuth2ClientBundle](https://github.com/knpuniversity/oauth2-client-bundle)
 * [SamlBundle](https://github.com/pdias/SamlBundle)
@@ -66,6 +66,9 @@ ssp_guard:
             user_id: uid
 ```
 
+Where in this example `admin` and `symfony` are names defined in your SSP's
+`authsources.php`.
+
 ### Step 5: Create Guard Authentication classes
 
 In order to authenticate you need to create a Guard authenticator for each authsource you use.
@@ -73,6 +76,9 @@ In order to authenticate you need to create a Guard authenticator for each auths
 A `SSPGuardAuthenticator` base class exists to do it easy:
 
 ```php
+<?php
+// src/AppBundle/Security/AdminAuthenticator.php
+
 namespace AppBundle\Security;
 
 use Sgomez\Bundle\SSPGuardBundle\Security\Authenticator\SSPGuardAuthenticator;
@@ -116,7 +122,7 @@ class AdminAuthenticator extends SSPGuardAuthenticator
 }
 ```
 
-And create the service definition:
+And create the service definition, e.g.:
 
 ```xml
 <service id="app.admin.authenticator" class="AppBundle\Security\AdminAuthenticator">
@@ -126,17 +132,17 @@ And create the service definition:
 </service>
 ```
 
+or in `app/config/services.yml`:
+
 ```yml
-app.admin.authenticator:
-    class: AppBundle\Security\AdminAuthenticator
+AppBundle\Security\AdminAuthenticator:
     arguments: ["@router", "@ssp.guard.registry", "admin"] 
 ```
 
-
 ### Step 6: Create a custom User Provider
 
-If you use [FOSUserBundle]() you can use it or you can create your own 
-[custom User Provider](http://symfony.com/doc/current/cookbook/security/custom_provider.html).
+If you use [FOSUserBundle](https://github.com/FriendsOfSymfony/FOSUserBundle) you can use it or you can create your own 
+[custom User Provider](https://symfony.com/doc/current/cookbook/security/custom_provider.html).
 
 Your user provider will be passed to `SSPGuardAuthenticator::getUser` method and it's used to search users.
 
