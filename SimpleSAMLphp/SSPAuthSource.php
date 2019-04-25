@@ -30,7 +30,7 @@ class SSPAuthSource
      */
     public function __construct($authSource, array $options = [])
     {
-        $this->auth = new \SimpleSAML_Auth_Simple($authSource);
+        $this->auth = new \SimpleSAML\Auth\Simple($authSource);
         $this->options = $options;
     }
 
