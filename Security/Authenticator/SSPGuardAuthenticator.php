@@ -53,22 +53,21 @@ abstract class SSPGuardAuthenticator extends AbstractGuardAuthenticator
         $this->authSourceId = $authSourceId;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request)
+    {
+        $match = $this->router->match($request->getPathInfo());
+        return 'ssp_guard_check' === $match['_route'] &&
+            $this->authSourceId === $match['authSource'];
+    }
 
     /**
      * {@inheritdoc}
      */
     public function getCredentials(Request $request)
     {
-        $match = $this->router->match($request->getPathInfo());
-
-        if (
-            'ssp_guard_check' !== $match['_route']
-            || $this->authSourceId !== $match['authSource']
-        ) {
-            // skip authentication unless we're on this route
-            return;
-        }
-
         $this->authSource = $this->authSourceRegistry->getAuthSource($this->authSourceId);
 
         return $this->authSource->getCredentials();
