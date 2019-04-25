@@ -98,7 +98,7 @@ class AdminAuthenticator extends SSPGuardAuthenticator
     
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        return $userProvider->loadUserByUsername($credentials['user'][0]);
+        return $userProvider->loadUserByUsername($credentials[$this->authsource->getUserId()][0]);
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
