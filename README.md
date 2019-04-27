@@ -128,7 +128,6 @@ And create the service definition, e.g.:
 <service id="app.admin.authenticator" class="AppBundle\Security\AdminAuthenticator">
     <argument type="service" id="router"/>
     <argument type="service" id="ssp.guard.registry"/>
-    <argument>admin</argument> <!-- this is the authsource id -->
 </service>
 ```
 
@@ -136,7 +135,7 @@ or in `app/config/services.yml`:
 
 ```yml
 AppBundle\Security\AdminAuthenticator:
-    arguments: ["@router", "@ssp.guard.registry", "admin"] 
+    arguments: ["@router", "@ssp.guard.registry"]
 ```
 
 ### Step 6: Create a custom User Provider
