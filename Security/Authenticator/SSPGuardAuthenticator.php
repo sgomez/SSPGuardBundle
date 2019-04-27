@@ -35,10 +35,6 @@ abstract class SSPGuardAuthenticator extends AbstractGuardAuthenticator
      * @var SSPAuthSource
      */
     protected $authSource = null;
-    /**
-     * @var
-     */
-    protected $authSourceId;
 
     /**
      * SSPGuardAuthenticator constructor.
@@ -46,11 +42,10 @@ abstract class SSPGuardAuthenticator extends AbstractGuardAuthenticator
      * @param Router $router
      * @param AuthSourceRegistry $authSourceRegistry
      */
-    public function __construct(Router $router, AuthSourceRegistry $authSourceRegistry, $authSourceId)
+    public function __construct(Router $router, AuthSourceRegistry $authSourceRegistry)
     {
         $this->router = $router;
         $this->authSourceRegistry = $authSourceRegistry;
-        $this->authSourceId = $authSourceId;
     }
 
     /**
@@ -59,8 +54,7 @@ abstract class SSPGuardAuthenticator extends AbstractGuardAuthenticator
     public function supports(Request $request)
     {
         $match = $this->router->match($request->getPathInfo());
-        return 'ssp_guard_check' === $match['_route'] &&
-            $this->authSourceId === $match['authSource'];
+        return 'ssp_guard_check' === $match['_route'];
     }
 
     /**
@@ -68,7 +62,8 @@ abstract class SSPGuardAuthenticator extends AbstractGuardAuthenticator
      */
     public function getCredentials(Request $request)
     {
-        $this->authSource = $this->authSourceRegistry->getAuthSource($this->authSourceId);
+        $match = $this->router->match($request->getPathInfo());
+        $this->authSource = $this->authSourceRegistry->getAuthSource($match['authSource']);
 
         return $this->authSource->getCredentials();
     }
