@@ -37,35 +37,39 @@ class SSPGuardExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('ssp_guard.installation_path', $config['installation_path']);
-        if (method_exists($container, 'resolveEnvPlaceholders')) {
-            $container->setParameter('ssp_guard.installation_path', $container->resolveEnvPlaceholders($container->getParameter('ssp_guard.installation_path'), true));
-        }
-
-        // Find SimpleSAMLphp _autoload.php file
-        $autoloadPath = sprintf('%s/lib/_autoload.php', rtrim($container->getParameter('ssp_guard.installation_path'), '/'));
-        if (false === file_exists($autoloadPath)) {
-            throw new InvalidConfigurationException('The path "ssp_guard.installation_path" doesn\'t contain a valid SimpleSAMLphp installation: '.$autoloadPath);
-        }
-        $this->autoloadPath = $autoloadPath;
-
         $authSources = $config['auth_sources'];
         $authSourcesKeys = [];
 
-        foreach ($authSources as $key => $authSource) {
-            $tree = new TreeBuilder();
-            $node = $tree->root('ssp_guard/auth_sources/'.$key);
-            $this->buildConfigurationForAuthSource($node, $key);
-            $processor = new Processor();
-            $config = $processor->process($tree->buildTree(), [$authSource]);
+        // Only configure the bundle if we have a configuration
+        if (count($authSources) > 0) {
 
-            $authSourceKey = $this->configureAuthSource(
-                $container,
-                $key,
-                $config
-            );
+            $container->setParameter('ssp_guard.installation_path', $config['installation_path']);
+            if (method_exists($container, 'resolveEnvPlaceholders')) {
+                $container->setParameter('ssp_guard.installation_path', $container->resolveEnvPlaceholders($container->getParameter('ssp_guard.installation_path'), true));
+            }
 
-            $authSourcesKeys[$key] = $authSourceKey;
+            // Find SimpleSAMLphp _autoload.php file
+            $autoloadPath = sprintf('%s/lib/_autoload.php', rtrim($container->getParameter('ssp_guard.installation_path'), '/'));
+            if (false === file_exists($autoloadPath)) {
+                throw new InvalidConfigurationException('The path "ssp_guard.installation_path" doesn\'t contain a valid SimpleSAMLphp installation: '.$autoloadPath);
+            }
+            $this->autoloadPath = $autoloadPath;
+
+            foreach ($authSources as $key => $authSource) {
+                $tree = new TreeBuilder();
+                $node = $tree->root('ssp_guard/auth_sources/'.$key);
+                $this->buildConfigurationForAuthSource($node, $key);
+                $processor = new Processor();
+                $config = $processor->process($tree->buildTree(), [$authSource]);
+
+                $authSourceKey = $this->configureAuthSource(
+                    $container,
+                    $key,
+                    $config
+                );
+
+                $authSourcesKeys[$key] = $authSourceKey;
+            }
         }
 
         $container->getDefinition('ssp.guard.registry')
